@@ -1,6 +1,6 @@
 /*!
- * vue-braintree v2.1.0 
- * (c) 2021 
+ * vue-braintree v2.2.0 
+ * (c) 2022 
  * Released under the undefined License.
  */
 (function (global, factory) {
@@ -9,20 +9,16 @@
   (global = global || self, global.VueBraintree = factory(global.dropIn));
 }(this, (function (dropIn) { 'use strict';
 
-  dropIn = dropIn && dropIn.hasOwnProperty('default') ? dropIn['default'] : dropIn;
+  dropIn = dropIn && Object.prototype.hasOwnProperty.call(dropIn, 'default') ? dropIn['default'] : dropIn;
 
   function _typeof(obj) {
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function (obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
+    "@babel/helpers - typeof";
 
-    return _typeof(obj);
+    return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+      return typeof obj;
+    } : function (obj) {
+      return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    }, _typeof(obj);
   }
 
   var script = {
@@ -83,7 +79,14 @@
         required: false,
         default: null,
         validator: function validator(value) {
-          return _typeof(value) === 'object';
+          return _typeof(value) === "object";
+        }
+      },
+      on: {
+        type: Array,
+        required: false,
+        default: function _default() {
+          return [];
         }
       }
     },
@@ -109,7 +112,8 @@
         googlePay: this.googlePay,
         vaultManager: this.vaultManager,
         card: this.card,
-        threeDSecure: this.threeDSecure
+        threeDSecure: this.threeDSecure,
+        on: this.on
       }; // Create dropin
 
       dropIn.create(config, function (createErr, instance) {
@@ -124,8 +128,24 @@
 
         _this.instance = instance; // Load event
 
-        _this.$emit("load", _this.instance);
+        _this.$emit("load", _this.instance); // emit requested events
+
+
+        _this.on.forEach(function (event) {
+          return _this.instance.on(event, function (e) {
+            return _this.$emit(event, e);
+          });
+        });
       });
+    },
+    beforeDestroy: function beforeDestroy() {
+      if (this.instance) {
+        this.instance.teardown(function (err) {
+          if (err) {
+            console.error("An error occurred during teardown:", err);
+          }
+        });
+      }
     },
     methods: {
       submit: function submit(event) {
@@ -245,7 +265,7 @@
   const __vue_script__ = script;
 
   /* template */
-  var __vue_render__ = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"payment"},[_c('div',{ref:"dropin"}),_vm._v(" "),_vm._t("button",[_c('button',{class:_vm.btnClass,on:{"click":_vm.submit}},[_vm._v(_vm._s(_vm.btnText))])],{"submit":_vm.submit})],2)};
+  var __vue_render__ = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"payment"},[_c('div',{ref:"dropin"}),_vm._v(" "),_vm._t("button",function(){return [_c('button',{class:_vm.btnClass,on:{"click":_vm.submit}},[_vm._v("\n      "+_vm._s(_vm.btnText)+"\n    ")])]},{"submit":_vm.submit})],2)};
   var __vue_staticRenderFns__ = [];
 
     /* style */
@@ -273,10 +293,10 @@
       undefined
     );
 
-  var version = '2.1.0';
+  var version = "2.2.0";
 
   var install = function install(Vue) {
-    Vue.component('v-braintree', Payment);
+    Vue.component("v-braintree", Payment);
   };
 
   var plugin = {
@@ -284,7 +304,7 @@
     version: version
   };
 
-  if (typeof window !== 'undefined' && window.Vue) {
+  if (typeof window !== "undefined" && window.Vue) {
     window.Vue.use(plugin);
   }
 

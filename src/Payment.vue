@@ -77,7 +77,12 @@ export default {
       validator: (value) => {
         return typeof value === "object";
       }
-    }
+    },
+    on: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -98,7 +103,8 @@ export default {
       googlePay: this.googlePay,
       vaultManager: this.vaultManager,
       card: this.card,
-      threeDSecure: this.threeDSecure
+      threeDSecure: this.threeDSecure,
+      on: this.on,
     };
     // Create dropin
     dropIn.create(config, (createErr, instance) => {
@@ -112,6 +118,8 @@ export default {
       this.instance = instance;
       // Load event
       this.$emit("load", this.instance);
+      // emit requested events
+      this.on.forEach(event => this.instance.on(event, (e) => this.$emit(event, e)))
     });
   },
   beforeDestroy () {
