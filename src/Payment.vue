@@ -64,7 +64,7 @@ export default {
       default: false
     },
     card: {
-      type: Object,
+      type: Object | false,
       default: undefined
     },
     threeDSecure: {
